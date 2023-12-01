@@ -24,7 +24,7 @@ class Knight extends ChessPiece {
         const movementRestricted = true         
 
         // Set the Bishop properties in the superclass
-        super(colour, symbol, position, movement, movementRestricted)
+        super('Knight', colour, symbol, position, movement, movementRestricted)
 
 
         /* SET PROPERTIES FOR CURRENT Knight CLASS */

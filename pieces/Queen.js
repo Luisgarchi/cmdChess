@@ -28,7 +28,7 @@ class Queen extends ChessPiece {
         const movementRestricted = false
 
         // Set the Bishop properties in the superclass
-        super(colour, symbol, position, movement, movementRestricted)
+        super('Queen', colour, symbol, position, movement, movementRestricted)
 
         
         /* SET PROPERTIES FOR CURRENT Rook CLASS */

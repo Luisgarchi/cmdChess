@@ -28,7 +28,7 @@ class King extends ChessPiece {
         const movementRestricted = true
 
         // Set the Bishop properties in the superclass
-        super(colour, symbol, position, movement, movementRestricted)
+        super('King', colour, symbol, position, movement, movementRestricted)
 
         
         /* SET PROPERTIES FOR CURRENT King CLASS */

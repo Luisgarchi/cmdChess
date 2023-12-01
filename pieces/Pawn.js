@@ -28,7 +28,7 @@ class Pawn extends ChessPiece {
         const movementRestricted = true     
 
         // Set the Pawn properties in the superclass
-        super(colour, symbol, position, movement, movementRestricted)
+        super('Pawn', colour, symbol, position, movement, movementRestricted)
 
     
         /* SET PROPERTIES FOR CURRENT Rook CLASS */
@@ -38,6 +38,36 @@ class Pawn extends ChessPiece {
 
         // Boolean to check if the piece is currently pinned to the King
         this.pinned = false
+    }
+
+
+    reachableSquares(){
+
+        // Method overwrites chessPiece method to include pawn movement 
+        // of 2 squares from starting rank
+        
+        // Initialize a list where the reachable positions will be stored when found.
+        const allReachablePositions = []
+
+        // Iterate over all vectors, find and storing all positions along that vector
+        for (let i = 0; i < this._movement.length; i++){
+
+            // check for the
+            if ((this._movement[i][0] == 2) && (this._movement[i][1] == 0)){
+
+                // get the starting rank depending on the colour of the pawn
+                const startingRank = (this._colour == 'white') ? '2' : '7'
+                if (startingRank != this._position[1]){
+                    // if the ranks do not match we skip this vector
+                    break
+                }
+            }
+            
+            const positionsAlongVector = this.findPositionsAlongVector(this._movement[i])
+            allReachablePositions.push(...positionsAlongVector)
+        }
+        
+        return allReachablePositions
     }
 
 }

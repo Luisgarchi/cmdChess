@@ -167,12 +167,10 @@ class ChessBoard extends Board {
 
     checkMoveUnimpeded(piece, targetPosition){
 
-        /* Checks that a piece can move from its starting position (piece.position)
-        to the targetPosition by checking if any board pieces impede the movement 
+        /* Checks that a piece can move from its starting position to the targetPosition. 
         returns an object about the status of the blocking piece */
 
         // First get the vector along which the piece is intending to move
-        const startPosition = piece.position
         const vector = this._getVector()
 
         // Find all other square that lie on this vector not including piece.position.
@@ -180,34 +178,37 @@ class ChessBoard extends Board {
 
         // Check if any of the pieces on the board block the piece from moving to targetPosition
         for (let i = 0; i < this.pieces.length; i++){
-
-            // If there is any piece of the same colour on any squares in 
-            // squaresAlongVector, the move is invalid
-            if ((this.pieces[i].colour == piece.colour) &&                      // same colour
-                (squaresAlongVector.include(this.pieces[i].position))) {        // blocking
-                    return {isBlocked: true, blockingPiece :this.pieces[i]}
-            } 
             
-            // If there is an opposing coloured piece on any but the 
-            // targetPosition, the move is invalid
-            else if((this.pieces[i].colour != piece.colour) &&                  // different colour
-                (squaresAlongVector                                             
-                    .slice(0, squaresAlongVector.length - 1)                    // not including last
-                    .include(this.pieces[i].position))){                        // blocking
+            /* If a different piece is blocking it will lie along the vector of sqaures from the
+            piece's original position (not included) to the targetPosition (included). However...
+            
+            There are two exceptions: 
+            - If the blocking piece is an opposing coloured piece on the targetPosition,
+              the move is not considered invalid because said piece may be captured.
+            - Pawns are not able to capture an opposing coloured piece on the targetPosition 
+              if the intended move is along a file. 
+
+            Variable "includeLastSquare" and boolean "exceptions" implement the above logic */
+
+            const movementAlongFile = (vector[0] == 0)
+            const exceptions = (
+                (this.pieces[i].colour == piece.colour) ||          
+                ((piece.type == 'Pawn') && (movementAlongFile))
+                )
+
+            const includeLastSquare = (exceptions) ? 0 : -1
+
+            if((squaresAlongVector                                             
+                    .slice(0, squaresAlongVector.length + includeLastSquare)      // slice to account for exception
+                    .include(this.pieces[i].position))){                          // check if blocking or not
                         return {isBlocked: true, blockingPiece :this.pieces[i]}
             }
         }
 
-        // There is not piece blocking the piece
+        // There is not piece blocking
         return {isBlocked: false, blockingPiece :{}}
     }
     
-
-    // In the case that there is only an opposing coloured piece on the targetPosition
-    // the piece moves to the targetPosition by capturing the enemy piece
-    // This indented comment-logic should be moved to a different method (potentially called move)
-
-
 
     _getVector(positionA, positionB){
 
@@ -245,6 +246,33 @@ class ChessBoard extends Board {
     }
 
 
+    canPawnCapture(pawn, vector){
+
+        /* Method checks if the specified pawn moving along a specified
+        DIAGONAL vector is a legal pawn capture. This function enforces
+        that a player can not move a pawn diagonally if there is not an 
+        enemy pawn present in the diagonal square to be captured*/
+
+        // Get position of enemy piece for legal capture along specified vector
+        const positionEnemyPiece = piece.findPositionsAlongVector(vector)[0]
+
+        // Check the board for enemy piece at the required location 
+        for(let i = 0; i < this.pieces.length; i++){
+
+            // In order for a piece to be captured it must be of a different colour
+            // as well as being in the diagonal vector position
+            if ((this.pieces[i].colour != pawn.colour) &&
+                (this.pieces[i].position == positionEnemyPiece)){  
+                    return true
+            }
+        }
+
+        // no enemy piece was found in the required position so return false
+        return false
+    }
+
+
+
     makeMove(move){
 
         // Since validation of moves throws errors wrap in a try-catch block  
@@ -266,6 +294,8 @@ class ChessBoard extends Board {
             throw(error)
         }
     }
+
+
 
     validateUCI(move) {
 
@@ -304,8 +334,14 @@ class ChessBoard extends Board {
             throw new PieceMovementError(piece)
         }
 
-        // 6.5) Extra logic incase piece is a Pawn
-        if 
+        // 6.5) Extra logic for Pawn capture movement
+        const vector = this._getVector(startPosition, endPosition)
+        const isDiagonalVector = ((Math.abs(vector[0]) == 1) && (Math.abs(vector[1]) == 1))
+        if ((piece.type == 'Pawn')      &&                       // Only Pawns
+            (isDiagonalVector)          &&                       // Diagonal moves 
+            (!this.canPawnCaptureOnMove(piece, vector))){        // Check capture 
+                throw new PieceMovementError(piece)
+        }
 
         // 7) Check that the piece is not blocked by another piece 
         const {blockedStatus, blockingPiece} = this.checkMoveUnimpeded(piece, endPosition)
@@ -317,8 +353,11 @@ class ChessBoard extends Board {
         return true
     }
 
-    movePiece(pieceName, pieceColour, newPosition, initialPosition = null){
 
+    movePiece(){
+
+
+        
         // First step is to find the piece we want to move
         if (initialPosition) {
             const piece = this.getPieceAt()
