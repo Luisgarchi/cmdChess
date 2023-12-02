@@ -177,8 +177,8 @@ class Board {
     _moveCharacter(startRow, startColumn, endRow, endColumn){
 
         // Get the symbol of the character we want to move
-        const startRowIndex = this.#formatRow(row)
-        const startColumnIndex = this.#formatColumn(column)
+        const startRowIndex = this.#formatRow(startRow)
+        const startColumnIndex = this.#formatColumn(startColumn)
         const symbol = this.#board[startRowIndex][startColumnIndex]
 
         // Remove the character from the starting position

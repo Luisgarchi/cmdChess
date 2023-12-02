@@ -31,7 +31,7 @@ class ChessPiece {
     }
 
     // Setters
-    set updatePosition(newPosition) {
+    set updatedPosition(newPosition) {
         this._position = newPosition
     }
 

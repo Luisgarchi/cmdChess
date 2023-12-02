@@ -14,7 +14,7 @@ class ChessBoard extends Board {
         const columns = 8
 
         // Create a chess board by calling the super class
-        super(rows, columns, heightRows, heightColumns, notation)
+        super(rows, columns, heightRows, heightColumns)
 
         // Initialize chess pieces as an array of objects
         this.pieces = this.#initializePieces()
@@ -87,16 +87,28 @@ class ChessBoard extends Board {
             const position = piece.position
 
             // get file and rank
-            const file = position[0]
-            const rank = position[1]
-
-            // convert file and rank in an integer
-            const intFile = fileToNum(file)
-            const intRank = rankToNum(rank)
+            const intPosition = this.#splitPosition(position)
             
             // place the symbol of the piece on the board
-            this._addCharacter(symbol, intRank, intFile)
+            this._addCharacter(symbol, intPosition.rank, intPosition.file)
         }
+    }
+
+    #splitPosition(position){
+
+        /* Takes a position in Standard Algebraic Notation and return a decomposed 
+        object containing numeric representations of the file and rank */
+
+        // get file and rank
+        const file = position[0]
+        const rank = position[1]
+
+        // convert file and rank in an integer
+        const intFile = fileToNum(file)
+        const intRank = rankToNum(rank)
+
+        // return as object properties
+        return {file: intFile, rank: intRank}
     }
 
 
@@ -140,7 +152,7 @@ class ChessBoard extends Board {
         }
 
         // return an object with the status and any error messages
-        return {validStatus : status, errorMessages : errors}
+        return {status, errors}
     }
     
 
@@ -172,8 +184,8 @@ class ChessBoard extends Board {
         returns an object about the status of the blocking piece */
 
         // First get the vector along which the piece is intending to move
-        const vector = this._getVector()
-
+        const vector = this._getVector(piece.position, targetPosition)
+        console.log(vector)
         // Find all other square that lie on this vector not including piece.position.
         const squaresAlongVector = piece.findPositionsAlongVector(vector)
 
@@ -201,7 +213,7 @@ class ChessBoard extends Board {
 
             if((squaresAlongVector                                             
                     .slice(0, squaresAlongVector.length + includeLastSquare)      // slice to account for exception
-                    .include(this.pieces[i].position))){                          // check if blocking or not
+                    .includes(this.pieces[i].position))){                          // check if blocking or not
                         return {isBlocked: true, blockingPiece :this.pieces[i]}
             }
         }
@@ -215,18 +227,16 @@ class ChessBoard extends Board {
 
         // Takes two positions and finds the vector between the two
 
-        // Decompose positionA_AN into file and rank
-        const fileA = fileToNum(positionA[0])
-        const rankA = rankToNum(positionA[1])
-
-        // Decompose positionB into file and rank
-        const fileB = fileToNum(positionB[0])
-        const rankB = rankToNum(positionB[1])
-
+        // Decompose into file and rank
+        const intPositionA = this.#splitPosition(positionA)
+        const intPositionB= this.#splitPosition(positionB)
+        
         // Calculate direction components
-        const fileVector = fileA - fileB
-        const rankVector = rankA - rankB
+        const fileVector = intPositionA.file - intPositionB.file
+        const rankVector = intPositionA.rank - intPositionB.rank
 
+        console.log(fileVector, rankVector)
+        
         // Reduce to simplest form
         let vector
 
@@ -309,16 +319,16 @@ class ChessBoard extends Board {
 
         // 2) Check the start position is in valid notation
         const startPosition = move.slice(0, 2)
-        const {startValidStatus, startErrorMessages} = this.isValidBoardPosition(startPosition)
-        if (!startValidStatus){
-            throw new InvalidPositionError(startPosition, startErrorMessages)
+        const startPositionValid = this.isValidBoardPosition(startPosition)
+        if (!startPositionValid){
+            throw new InvalidPositionError(startPosition, startPositionValid.errors)
         }
 
         // 3) Check the end position is in valid notation
         const endPosition = move.slice(2, 4)
-        const {endValidStatus, endErrorMessages} = this.isValidBoardPosition(endPosition)
-        if (!endValidStatus){
-            throw new InvalidPositionError(endPosition, endErrorMessages)
+        const endPositionValid = this.isValidBoardPosition(endPosition)
+        if (!endPositionValid){
+            throw new InvalidPositionError(endPosition, endPositionValid.errors)
         }
 
         // 4) Check if there is a piece at the starting position
@@ -352,6 +362,7 @@ class ChessBoard extends Board {
         }
 
         // the move has passed all the conditions and is validated
+
         return {piece, startPosition, endPosition}
     }
 
@@ -360,40 +371,45 @@ class ChessBoard extends Board {
 
         // DESCRIPTION
 
-        // Check if the end position results in capture
-        for 
+        // Handle case for enemy piece captured by moving to the endPosition
+        this.#handleCapture(piece, endPosition) 
 
+        // Move the piece on the representation of the board
+        const intStartPosition = this.#splitPosition(startPosition)
+        const intEndPosition = this.#splitPosition(endPosition)
+        this._moveCharacter(intStartPosition.rank, intStartPosition.file, intEndPosition.rank, intEndPosition.file)
 
-        //
-
-
-        
-        // First step is to find the piece we want to move
-        if (initialPosition) {
-            const piece = this.getPieceAt()
-        }
-        
-
-        //for 
-
-        // Second 
+        // Update the piece object position
+        piece.updatedPosition = endPosition
     }
 
-    handleCapture(capturingPiece, endPosition){
+    #handleCapture(endPosition){
 
+        /* Loop over the pieces on the board and check if a piece's position matches
+        the position specified in the argument (endPosition).
+
+        * Note that this function assumes the necessary checks have been carried out:
+        - movement is valid and thus there is no need to check that another piece 
+        is blocking...
+        - And therefore any piece located at endPosition will be a different colour. */
+        
         let capturedIndex
         for (let i = 0; i < this.pieces.length; i++){
-            if (
-                (this.pieces[i].colour != capturingPiece.colour) && 
-                (this.pieces[i].position == endPosition)
-            ){
+            if ((this.pieces[i].position == endPosition)){
+                // When we find a piece stop and save the index of the piece
                 this.capturedPieces.push(this.this.pieces[i])
                 capturedIndex = i
                 break
             }
         }
+
         if(capturedIndex){
-            
+
+            // If a piece is captured add it to the "captured" array 
+            this.capturedPieces.push(this.pieces[capturedIndex])
+
+            // and remove it from the pieces array
+            this.pieces.splice(capturedIndex, 1)
         }
     }
 
@@ -407,14 +423,26 @@ class ChessBoard extends Board {
 module.exports = ChessBoard
 
 
-myboard = new ChessBoard(1,5)
-// console.log(myboard.board)
+myboard = new ChessBoard(1,5, 'UCI')
+myboard.buildBoard()
+myboard.display()
+myboard.makeMove('b1c3')
+myboard.buildBoard()
+myboard.display()
+myboard.makeMove('c3d5')
+myboard.buildBoard()
+myboard.display()
+myboard.makeMove('d5e7')
+myboard.buildBoard()
+myboard.display()
 
+/*
 for (let i = 0; i < myboard.pieces.length; i++){
     const piece = myboard.pieces[i]
     console.log(piece.position, piece.reachableSquares())
 }
+
+*/
 /*
-myboard.buildBoard()
-myboard.display()
+
 */
