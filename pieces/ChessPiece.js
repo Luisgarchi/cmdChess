@@ -35,6 +35,11 @@ class ChessPiece {
         return this._colour
     }
 
+    // Setters
+    set updatePosition(newPosition) {
+        this._position = newPosition
+    }
+
 
     reachableSquares(){
         

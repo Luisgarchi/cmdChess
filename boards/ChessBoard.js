@@ -248,10 +248,9 @@ class ChessBoard extends Board {
 
     canPawnCapture(pawn, vector){
 
-        /* Method checks if the specified pawn moving along a specified
-        DIAGONAL vector is a legal pawn capture. This function enforces
-        that a player can not move a pawn diagonally if there is not an 
-        enemy pawn present in the diagonal square to be captured*/
+        /* Method checks if the specified pawn moving along a specified DIAGONAL vector is
+        a legal pawn capture. This function enforces that a player can not move a pawn 
+        diagonally if there is not an enemy pawn present in the diagonal square to be captured*/
 
         // Get position of enemy piece for legal capture along specified vector
         const positionEnemyPiece = piece.findPositionsAlongVector(vector)[0]
@@ -277,17 +276,19 @@ class ChessBoard extends Board {
 
         // Since validation of moves throws errors wrap in a try-catch block  
         try {
-            
+            /*
             // separate cases for different input notation.
             if (this._notationMoves == 'SAN'){
                 // convert SAN to UCI
                 // const moveUCI = this.convertSANtoUCI(move)
                 // this.makeMove(moveUCI)
             }
-
-            else if ((this._notationMoves == 'UCI') && (this.validateUCI())){
-                this.makeMove(move)
+            */
+            if (this._notationMoves == 'UCI'){
+                const {} = this.validateUCI(move)
+                this.movePiece(move)
             }
+            
         } catch(error) {
             
             // throw the error again for the controller to handle it
@@ -339,7 +340,7 @@ class ChessBoard extends Board {
         const isDiagonalVector = ((Math.abs(vector[0]) == 1) && (Math.abs(vector[1]) == 1))
         if ((piece.type == 'Pawn')      &&                       // Only Pawns
             (isDiagonalVector)          &&                       // Diagonal moves 
-            (!this.canPawnCaptureOnMove(piece, vector))){        // Check capture 
+            (!this.canPawnCapture(piece, vector))){              // Check capture 
                 throw new PieceMovementError(piece)
         }
 
@@ -355,6 +356,10 @@ class ChessBoard extends Board {
 
 
     movePiece(){
+
+        // function description
+        
+        //
 
 
         
