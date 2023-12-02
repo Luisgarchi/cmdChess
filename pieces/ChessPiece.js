@@ -8,14 +8,9 @@ class ChessPiece {
         this._type     = type                           // the type of the chess piece
         this._colour   = colour                         // throw error if position does not match colour
         this._symbol   = symbol                         // utf-8 encoding of chess piece
-        this._captured = false                          // If piece is alive or not
         this._position = position                       // Position of piece on chess board
         this._movement = movement                       // Movement vectors of the piece
         this._movementRestricted = movementRestricted   // If piece can nove more than one vector 
-    }
-
-    captured(){
-        this._alive = true
     }
 
     // Getters 

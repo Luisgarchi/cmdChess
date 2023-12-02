@@ -137,17 +137,58 @@ class Board {
         this._visualBoard.push(boardRow)
     }
 
-    _addCharacter(character, row, column){
+    #formatRow(row){
+        
         /* subtract 1 from row because board is represented as an array (starts at zero index)
         subtract from #rows since we want lower rows displayed at the bottom of the console instead of at top*/ 
-        const rowIndex = (this.#rows - 1) - (row - 1)
+        return (this.#rows - 1) - (row - 1)
+    }
+
+
+    #formatColumn(column){
 
         // zero index columns
-        const columnIndex = column - 1
+        return column - 1
+    }
+
+
+    _addCharacter(character, row, column){
+ 
+        // Format row and columns
+        const rowIndex = this.#formatRow(row)
+        const columnIndex = this.#formatColumn(column)
 
         // add to board
         this.#board[rowIndex][columnIndex] = character
     }
+
+
+    _removeCharacter(row, column){
+
+        // Format row and columns
+        const rowIndex = this.#formatRow(row)
+        const columnIndex = this.#formatColumn(column)
+
+        // Add to board
+        this.#board[rowIndex][columnIndex] = " "
+    }
+
+    
+    _moveCharacter(startRow, startColumn, endRow, endColumn){
+
+        // Get the symbol of the character we want to move
+        const startRowIndex = this.#formatRow(row)
+        const startColumnIndex = this.#formatColumn(column)
+        const symbol = this.#board[startRowIndex][startColumnIndex]
+
+        // Remove the character from the starting position
+        this._removeCharacter(startRow, startColumn)
+
+        // Add the symbol at the end position
+        this._addCharacter(symbol,  endRow, endColumn)
+    }
+
+
 
     // PRINT THE BOARD TO THE CMD 
 

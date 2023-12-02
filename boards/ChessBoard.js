@@ -18,6 +18,7 @@ class ChessBoard extends Board {
 
         // Initialize chess pieces as an array of objects
         this.pieces = this.#initializePieces()
+        this.capturedPieces = []
 
         // Initialize the board starting position
         this.#initializeBoard()
@@ -285,8 +286,8 @@ class ChessBoard extends Board {
             }
             */
             if (this._notationMoves == 'UCI'){
-                const {} = this.validateUCI(move)
-                this.movePiece(move)
+                const {piece, startPosition, endPosition} = this.validateUCI(move)
+                this.movePiece(piece, startPosition, endPosition)
             }
             
         } catch(error) {
@@ -351,14 +352,18 @@ class ChessBoard extends Board {
         }
 
         // the move has passed all the conditions and is validated
-        return true
+        return {piece, startPosition, endPosition}
     }
 
 
-    movePiece(){
+    movePiece(piece, startPosition, endPosition){
 
-        // function description
-        
+        // DESCRIPTION
+
+        // Check if the end position results in capture
+        for 
+
+
         //
 
 
@@ -372,6 +377,24 @@ class ChessBoard extends Board {
         //for 
 
         // Second 
+    }
+
+    handleCapture(capturingPiece, endPosition){
+
+        let capturedIndex
+        for (let i = 0; i < this.pieces.length; i++){
+            if (
+                (this.pieces[i].colour != capturingPiece.colour) && 
+                (this.pieces[i].position == endPosition)
+            ){
+                this.capturedPieces.push(this.this.pieces[i])
+                capturedIndex = i
+                break
+            }
+        }
+        if(capturedIndex){
+            
+        }
     }
 
 
