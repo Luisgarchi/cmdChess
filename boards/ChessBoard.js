@@ -1,11 +1,18 @@
 const Board = require('./Board')
 const {Pawn, Bishop, Knight, Rook, Queen, King} = require('../pieces/index')
 const {fileToNum, rankToNum, createBoardDimensionObject, gcd}  = require('../utils')
-const {MovementBlockedError} = require('../errors/index')
+const {
+    MovementBlockedError, 
+    PieceMovementError, 
+    NoPieceFoundError, 
+    InvalidPositionError, 
+    InvalidNotationError
+} = require('../errors/index')
+
 
 class ChessBoard extends Board {
 
-    constructor(heightRows, heightColumns, notationMoves) {
+    constructor(heightRows, heightColumns, notationMoves, testing = false) {
 
         // Chess board has 8 rows known as ranks
         const rows = 8
@@ -17,8 +24,8 @@ class ChessBoard extends Board {
         super(rows, columns, heightRows, heightColumns)
 
         // Initialize chess pieces as an array of objects
-        this.pieces = this.#initializePieces()
-        this.capturedPieces = []
+        this._pieces = (!testing) ? this.#initializePieces() : testing
+        this._capturedPieces = []
 
         // Initialize the board starting position
         this.#initializeBoard()
@@ -28,6 +35,14 @@ class ChessBoard extends Board {
         this._boardLabels = createBoardDimensionObject('a', 'h', '1', '8')
     }
 
+    // Getters
+    get pieces(){
+        return this._pieces
+    }
+
+    get capturedPieces(){
+        return this._capturedPieces
+    }
 
 
     #initializePieces(){
@@ -77,10 +92,10 @@ class ChessBoard extends Board {
 
         // Method that initializes the boards starting position
         
-        for(let i = 0; i < this.pieces.length; i++) {
+        for(let i = 0; i < this._pieces.length; i++) {
 
             // get the piece
-            const piece = this.pieces[i]
+            const piece = this._pieces[i]
 
             // get the piece's symbol and position
             const symbol = piece.symbol
@@ -165,11 +180,11 @@ class ChessBoard extends Board {
         let piece = null
 
         // Iterate over all the piece on the board
-        for (let i = 0; i < this.pieces.length; i++) {
+        for (let i = 0; i < this._pieces.length; i++) {
 
             // Check if a piece matches is on the required position
-            if (this.pieces[i].position == position) {
-                piece = this.pieces[i]
+            if (this._pieces[i].position == position) {
+                piece = this._pieces[i]
                 break
             }
         }
@@ -185,12 +200,12 @@ class ChessBoard extends Board {
 
         // First get the vector along which the piece is intending to move
         const vector = this._getVector(piece.position, targetPosition)
-        console.log(vector)
+
         // Find all other square that lie on this vector not including piece.position.
         const squaresAlongVector = piece.findPositionsAlongVector(vector)
 
         // Check if any of the pieces on the board block the piece from moving to targetPosition
-        for (let i = 0; i < this.pieces.length; i++){
+        for (let i = 0; i < this._pieces.length; i++){
             
             /* If a different piece is blocking it will lie along the vector of sqaures from the
             piece's original position (not included) to the targetPosition (included). However...
@@ -205,7 +220,7 @@ class ChessBoard extends Board {
 
             const movementAlongFile = (vector[0] == 0)
             const exceptions = (
-                (this.pieces[i].colour == piece.colour) ||          
+                (this._pieces[i].colour == piece.colour) ||          
                 ((piece.type == 'Pawn') && (movementAlongFile))
                 )
 
@@ -213,8 +228,8 @@ class ChessBoard extends Board {
 
             if((squaresAlongVector                                             
                     .slice(0, squaresAlongVector.length + includeLastSquare)      // slice to account for exception
-                    .includes(this.pieces[i].position))){                          // check if blocking or not
-                        return {isBlocked: true, blockingPiece :this.pieces[i]}
+                    .includes(this._pieces[i].position))){                          // check if blocking or not
+                        return {isBlocked: true, blockingPiece :this._pieces[i]}
             }
         }
 
@@ -234,8 +249,6 @@ class ChessBoard extends Board {
         // Calculate direction components
         const fileVector = intPositionA.file - intPositionB.file
         const rankVector = intPositionA.rank - intPositionB.rank
-
-        console.log(fileVector, rankVector)
         
         // Reduce to simplest form
         let vector
@@ -267,12 +280,12 @@ class ChessBoard extends Board {
         const positionEnemyPiece = piece.findPositionsAlongVector(vector)[0]
 
         // Check the board for enemy piece at the required location 
-        for(let i = 0; i < this.pieces.length; i++){
+        for(let i = 0; i < this._pieces.length; i++){
 
             // In order for a piece to be captured it must be of a different colour
             // as well as being in the diagonal vector position
-            if ((this.pieces[i].colour != pawn.colour) &&
-                (this.pieces[i].position == positionEnemyPiece)){  
+            if ((this._pieces[i].colour != pawn.colour) &&
+                (this._pieces[i].position == positionEnemyPiece)){  
                     return true
             }
         }
@@ -394,10 +407,10 @@ class ChessBoard extends Board {
         - And therefore any piece located at endPosition will be a different colour. */
         
         let capturedIndex
-        for (let i = 0; i < this.pieces.length; i++){
-            if ((this.pieces[i].position == endPosition)){
+        for (let i = 0; i < this._pieces.length; i++){
+            if ((this._pieces[i].position == endPosition)){
                 // When we find a piece stop and save the index of the piece
-                this.capturedPieces.push(this.this.pieces[i])
+                this._capturedPieces.push(this.this._pieces[i])
                 capturedIndex = i
                 break
             }
@@ -406,10 +419,10 @@ class ChessBoard extends Board {
         if(capturedIndex){
 
             // If a piece is captured add it to the "captured" array 
-            this.capturedPieces.push(this.pieces[capturedIndex])
+            this._capturedPieces.push(this._pieces[capturedIndex])
 
             // and remove it from the pieces array
-            this.pieces.splice(capturedIndex, 1)
+            this._pieces.splice(capturedIndex, 1)
         }
     }
 
@@ -417,32 +430,17 @@ class ChessBoard extends Board {
 }
 
 
-
-
-
 module.exports = ChessBoard
 
 
-myboard = new ChessBoard(1,5, 'UCI')
-myboard.buildBoard()
-myboard.display()
-myboard.makeMove('b1c3')
-myboard.buildBoard()
-myboard.display()
-myboard.makeMove('c3d5')
-myboard.buildBoard()
-myboard.display()
-myboard.makeMove('d5e7')
-myboard.buildBoard()
-myboard.display()
+const move = 'c3c4'
+const startPieces = [
+    new Knight("white", "c4"),
+    new Pawn("white", "c3"),]        // Piece being moved
 
-/*
-for (let i = 0; i < myboard.pieces.length; i++){
-    const piece = myboard.pieces[i]
-    console.log(piece.position, piece.reachableSquares())
-}
-
-*/
-/*
-
-*/
+testBoard = new ChessBoard(1,5, 'UCI', startPieces)
+testBoard.buildBoard()
+testBoard.display()
+testBoard.makeMove(move)
+testBoard.buildBoard()
+testBoard.display()
