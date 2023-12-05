@@ -14,12 +14,18 @@ class Pawn extends ChessPiece {
 
         // Define the movement mechanics
         // Pawns only move forward 
+
+        /* The direction is included since pawn movement vectors are not symetric.
+        By adding this variable, it establishes the directions black and white pawns move in*/
+        const direction = (colour == "white") ? 1 : -1
+
         const movement = [
-                            [1,0],           // Vector for moving Pawn North one square 
-                            [2,0],           // Vector for moving Pawn North two square *
-                            [1,1],           // Vector for moving Pawn diagonally capture right **
-                            [1, -1],         // Vector for moving Pawn diagonally capture left  ** 
-        ]            
+                            [(direction * 1),  0],         // Vector for moving Pawn along file one square 
+                            [(direction * 2),  0],         // Vector for moving Pawn along file two square *
+                            [(direction * 1),  1],         // Vector for moving Pawn diagonally capture right **
+                            [(direction * 1), -1],         // Vector for moving Pawn diagonally capture left  ** 
+        ]     
+
         // * Movement is only possible if the pawn has not moved (i.e. it is in its initial rank)
         // ** these apply to generic pawn captures as well as en passant.
         // Both of the above scenarios must be handled during a chess game (in the ChessBoard class)
@@ -52,14 +58,18 @@ class Pawn extends ChessPiece {
         // Iterate over all vectors, find and storing all positions along that vector
         for (let i = 0; i < this._movement.length; i++){
 
-            // check for the
-            if ((this._movement[i][0] == 2) && (this._movement[i][1] == 0)){
+            const vector     = this._movement[i]
+            const vectorFile = vector[1]
+            const vectorRank = vector[0]
+            
+            // Check that the pawn is still on the starting rank
+            if ((Math.abs(vectorRank) == 2) && (vectorFile == 0)){
 
                 // get the starting rank depending on the colour of the pawn
                 const startingRank = (this._colour == 'white') ? '2' : '7'
                 if (startingRank != this._position[1]){
                     // if the ranks do not match we skip this vector
-                    break
+                    continue
                 }
             }
             

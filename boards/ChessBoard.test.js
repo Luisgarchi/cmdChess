@@ -267,7 +267,7 @@ describe('Pawn', () => {
             // Define starting position of all pieces and move to test
             const move = 'd7d6'
             const startPieces = [
-                new Bishop("black, d6"),
+                new Bishop("black", "d6"),
                 new Pawn("black", "d7"),        // Piece being moved
             ]
 
@@ -300,7 +300,7 @@ describe('Pawn', () => {
             // Define starting position of all pieces and move to test
             const move = 'd7d5'
             const startPieces = [
-                new Bishop("black, d5"),
+                new Bishop("black", "d5"),
                 new Pawn("black", "d7"),        // Piece being moved
             ]
 

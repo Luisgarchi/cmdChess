@@ -199,7 +199,7 @@ class ChessBoard extends Board {
         returns an object about the status of the blocking piece */
 
         // First get the vector along which the piece is intending to move
-        const vector = this._getVector(piece.position, targetPosition)
+        const vector = this._getVector(piece, targetPosition)
 
         // Find all other square that lie on this vector not including piece.position.
         const squaresAlongVector = piece.findPositionsAlongVector(vector)
@@ -211,14 +211,14 @@ class ChessBoard extends Board {
             piece's original position (not included) to the targetPosition (included). However...
             
             There are two exceptions: 
-            - If the blocking piece is an opposing coloured piece on the targetPosition,
+            - If the blocking piece is an opposing coloured piece ON THE TARGET POSITION,
               the move is not considered invalid because said piece may be captured.
             - Pawns are not able to capture an opposing coloured piece on the targetPosition 
               if the intended move is along a file. 
 
             Variable "includeLastSquare" and boolean "exceptions" implement the above logic */
 
-            const movementAlongFile = (vector[0] == 0)
+            const movementAlongFile = (vector[1] == 0)
             const exceptions = (
                 (this._pieces[i].colour == piece.colour) ||          
                 ((piece.type == 'Pawn') && (movementAlongFile))
@@ -238,33 +238,40 @@ class ChessBoard extends Board {
     }
     
 
-    _getVector(positionA, positionB){
+    _getVector(piece, endPosition){
 
         // Takes two positions and finds the vector between the two
 
         // Decompose into file and rank
-        const intPositionA = this.#splitPosition(positionA)
-        const intPositionB= this.#splitPosition(positionB)
+        const intPositionA = this.#splitPosition(piece.position)
+        const intPositionB = this.#splitPosition(endPosition)
         
         // Calculate direction components
-        const fileVector = intPositionA.file - intPositionB.file
-        const rankVector = intPositionA.rank - intPositionB.rank
+        const fileVector = intPositionB.file - intPositionA.file  
+        const rankVector = intPositionB.rank - intPositionA.rank 
         
+        // If a pieces movement is restricted we can simply return the vector
+        if (piece.movementRestricted){
+            return [rankVector, fileVector]
+        }
+        
+        // Otherwise we need to simplify the vector
+
         // Reduce to simplest form
         let vector
 
         // Check for horizontal movement in only files or ranks
         if ((fileVector == 0) || (rankVector == 0)){
-            vector = (fileVector == 0) ? ([0, rankVector / Math.abs(rankVector)]) : ([fileVector / Math.abs(fileVector), 0])
+            vector = (fileVector == 0) ? ([rankVector / Math.abs(rankVector), 0]) : ([0, fileVector / Math.abs(fileVector)])
+            // N.B. by doing xVector / Math.abs(xVector) we preserve the sign (direction) of the vector
         } 
         else {
             const divideByGCD = gcd(fileVector, rankVector)
-            vector = [fileVector/divideByGCD, rankVector/divideByGCD]
+            vector = [rankVector/divideByGCD , fileVector/divideByGCD]
         }
-        // N.B. by doing xVector / Math.abs(xVector) we preserve the sign (direction) of the vector
         // N.B. Conditional logic: check if file vector is zero, 
-            // true: set vector = [0, +-1], 
-            // false: only logic alternative is that rank vector is zero so set vector = [+-1, 0] 
+            // true: set vector = [0, +/- 1], 
+            // false: only logic alternative is that rank vector is zero so set vector = [+/- 1, 0] 
     
         return vector
     }
@@ -282,7 +289,7 @@ class ChessBoard extends Board {
         // Check the board for enemy piece at the required location 
         for(let i = 0; i < this._pieces.length; i++){
 
-            // In order for a piece to be captured it must be of a different colour
+            // In der for a piece to be captured it must be of a different colour
             // as well as being in the diagonal vector position
             if ((this._pieces[i].colour != pawn.colour) &&
                 (this._pieces[i].position == positionEnemyPiece)){  
@@ -360,7 +367,7 @@ class ChessBoard extends Board {
         }
 
         // 6.5) Extra logic for Pawn capture movement
-        const vector = this._getVector(startPosition, endPosition)
+        const vector = this._getVector(piece, endPosition)
         const isDiagonalVector = ((Math.abs(vector[0]) == 1) && (Math.abs(vector[1]) == 1))
         if ((piece.type == 'Pawn')      &&                       // Only Pawns
             (isDiagonalVector)          &&                       // Diagonal moves 
@@ -369,8 +376,8 @@ class ChessBoard extends Board {
         }
 
         // 7) Check that the piece is not blocked by another piece 
-        const {blockedStatus, blockingPiece} = this.checkMoveUnimpeded(piece, endPosition)
-        if (blockedStatus) {
+        const {isBlocked, blockingPiece} = this.checkMoveUnimpeded(piece, endPosition)
+        if (isBlocked) {
             throw new MovementBlockedError(piece, blockingPiece, startPosition, endPosition)
         }
 
@@ -432,13 +439,13 @@ class ChessBoard extends Board {
 
 module.exports = ChessBoard
 
-
-const move = 'c3c4'
+const move = 'd7d5'
 const startPieces = [
-    new Knight("white", "c4"),
-    new Pawn("white", "c3"),]        // Piece being moved
-
+    new Bishop("black", "d5"),
+    new Pawn("black", "d7"),        // Piece being moved
+]
 testBoard = new ChessBoard(1,5, 'UCI', startPieces)
+
 testBoard.buildBoard()
 testBoard.display()
 testBoard.makeMove(move)

@@ -14,14 +14,14 @@ class Queen extends ChessPiece {
         // Define the movement mechanics as a vector (magnitude & direction)
         // Queens move horizonatlly or vertically along ranks and files as well as along diagonals
         const movement = [  
-                            [1, 0],         // Vector for moving Queen North
-                            [-1, 0],        // Vector for moving Queen South
-                            [0, 1],         // Vector for moving Queen East 
-                            [0, -1],        // Vector for moving Queen West 
-                            [1, 1],         // Vector for moving Queen North East
-                            [1, -1],        // Vector for moving Queen North West
-                            [-1, 1],        // Vector for moving Queen South East
-                            [-1, -1]        // Vector for moving Queen South West
+                            [1,  0],         // Vector for moving Queen North
+                            [-1, 0],         // Vector for moving Queen South
+                            [0,  1],         // Vector for moving Queen East 
+                            [0, -1],         // Vector for moving Queen West 
+                            [1,  1],         // Vector for moving Queen North East
+                            [1, -1],         // Vector for moving Queen North West
+                            [-1, 1],         // Vector for moving Queen South East
+                            [-1,-1],         // Vector for moving Queen South West
                         ]
 
         // Queens can move any amount along ranks, files or diagonals

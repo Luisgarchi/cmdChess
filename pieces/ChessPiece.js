@@ -30,10 +30,16 @@ class ChessPiece {
         return this._colour
     }
 
+    get movementRestricted(){
+        return this._movementRestricted
+    }
+    
+
     // Setters
     set updatedPosition(newPosition) {
         this._position = newPosition
     }
+    
 
 
     reachableSquares(){
@@ -62,13 +68,9 @@ class ChessPiece {
         let file = fileToNum(currentPosition[0])
         let rank = rankToNum(currentPosition[1])
 
-        /* The direction is included since pawn movement vectors are not symetric.
-        By adding this variable, it establishes the directions black and white pawns move in*/
-        const direction = (this._colour == "white") ? 1 : -1
-
         // Get the file and rank components of the vector
-        const vectorFile = direction * vector[1]
-        const vectorRank = direction * vector[0]
+        const vectorFile = vector[1]
+        const vectorRank = vector[0]
  
         // Add the vector to the file and rank
         do {
