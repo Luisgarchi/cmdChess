@@ -1,6 +1,6 @@
 class MoveVector {
 
-    constructor(rankVectorComponent, fileVectorComponent, restricted){
+    constructor(rankVectorComponent, fileVectorComponent, restricted = undefined){
         this.rankComponent = rankVectorComponent
         this.fileComponent = fileVectorComponent
         this.restricted = restricted

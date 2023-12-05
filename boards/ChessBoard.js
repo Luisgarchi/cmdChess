@@ -1,6 +1,6 @@
 const Board = require('./Board')
 const {Pawn, Bishop, Knight, Rook, Queen, King} = require('../pieces/index')
-const {fileToNum, rankToNum, createBoardDimensionObject, gcd}  = require('../utils')
+const MoveVector = require('../MoveVector')
 const {
     MovementBlockedError, 
     PieceMovementError, 
@@ -8,6 +8,7 @@ const {
     InvalidPositionError, 
     InvalidNotationError
 } = require('../errors/index')
+const {fileToNum, rankToNum, createBoardDimensionObject}  = require('../utils')
 
 
 class ChessBoard extends Board {
@@ -199,7 +200,11 @@ class ChessBoard extends Board {
         returns an object about the status of the blocking piece */
 
         // First get the vector along which the piece is intending to move
-        const vector = this._getVector(piece, targetPosition)
+        const initialPosition = piece.position
+        const vector = this._calculateVector(initialPosition, targetPosition)
+
+        // Use this vector to find the matching piece vector
+        const matchingPieceVector = piece.findMatchingVector(vector)
 
         // Find all other square that lie on this vector not including piece.position.
         const squaresAlongVector = piece.findPositionsAlongVector(vector)
@@ -236,46 +241,23 @@ class ChessBoard extends Board {
         // There is not piece blocking
         return {isBlocked: false, blockingPiece :{}}
     }
-    
 
-    _getVector(piece, endPosition){
-
+    _calculateVector(startPosition, endPosition){
+        
         // Takes two positions and finds the vector between the two
 
         // Decompose into file and rank
-        const intPositionA = this.#splitPosition(piece.position)
+        const intPositionA = this.#splitPosition(startPosition)
         const intPositionB = this.#splitPosition(endPosition)
         
         // Calculate direction components
         const fileVector = intPositionB.file - intPositionA.file  
         const rankVector = intPositionB.rank - intPositionA.rank 
-        
-        // If a pieces movement is restricted we can simply return the vector
-        if (piece.movementRestricted){
-            return [rankVector, fileVector]
-        }
-        
-        // Otherwise we need to simplify the vector
 
-        // Reduce to simplest form
-        let vector
+        // Compose vector
+        return MoveVector(rankVector, fileVector)
 
-        // Check for horizontal movement in only files or ranks
-        if ((fileVector == 0) || (rankVector == 0)){
-            vector = (fileVector == 0) ? ([rankVector / Math.abs(rankVector), 0]) : ([0, fileVector / Math.abs(fileVector)])
-            // N.B. by doing xVector / Math.abs(xVector) we preserve the sign (direction) of the vector
-        } 
-        else {
-            const divideByGCD = gcd(fileVector, rankVector)
-            vector = [rankVector/divideByGCD , fileVector/divideByGCD]
-        }
-        // N.B. Conditional logic: check if file vector is zero, 
-            // true: set vector = [0, +/- 1], 
-            // false: only logic alternative is that rank vector is zero so set vector = [+/- 1, 0] 
-    
-        return vector
     }
-
 
     canPawnCapture(pawn, vector){
 
