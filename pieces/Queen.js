@@ -1,4 +1,5 @@
 const ChessPiece = require('./ChessPiece')
+const MoveVector = require('../MoveVector')
 const {chessPieces} = require('../utils')
 
 
@@ -12,23 +13,33 @@ class Queen extends ChessPiece {
         const symbol = (colour == "white") ? chessPieces.white.Queen : chessPieces.black.Queen 
 
         // Define the movement mechanics as a vector (magnitude & direction)
-        // Queens move horizonatlly or vertically along ranks and files as well as along diagonals
-        const movement = [  
-                            [1,  0],         // Vector for moving Queen North
-                            [-1, 0],         // Vector for moving Queen South
-                            [0,  1],         // Vector for moving Queen East 
-                            [0, -1],         // Vector for moving Queen West 
-                            [1,  1],         // Vector for moving Queen North East
-                            [1, -1],         // Vector for moving Queen North West
-                            [-1, 1],         // Vector for moving Queen South East
-                            [-1,-1],         // Vector for moving Queen South West
-                        ]
 
-        // Queens can move any amount along ranks, files or diagonals
+        // Queens can move any amount of squares
         const movementRestricted = false
 
+        // Queens move horizonatlly or vertically along ranks and files as well as along diagonals
+        const movement = [
+                            // Vector for moving Queen North
+                            new MoveVector(1, 0, movementRestricted),
+                            // Vector for moving Queen South
+                            new MoveVector(-1, 0, movementRestricted),
+                            // Vector for moving Queen East
+                            new MoveVector(0, 1, movementRestricted),
+                            // Vector for moving Queen West 
+                            new MoveVector(0, -1, movementRestricted),        
+                            // Vector for moving Queen North East
+                            new MoveVector(1, 1, movementRestricted),
+                            // Vector for moving Queen North West
+                            new MoveVector(1, -1, movementRestricted),
+                            // Vector for moving Queen South East
+                            new MoveVector(-1, 1, movementRestricted),
+                            // Vector for moving Queen South West
+                            new MoveVector(-1, -1, movementRestricted)
+                        ]
+
+
         // Set the Bishop properties in the superclass
-        super('Queen', colour, symbol, position, movement, movementRestricted)
+        super('Queen', colour, symbol, position, movement)
 
         
         /* SET PROPERTIES FOR CURRENT Rook CLASS */

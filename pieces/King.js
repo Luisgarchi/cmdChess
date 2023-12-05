@@ -1,4 +1,5 @@
 const ChessPiece = require('./ChessPiece')
+const MoveVector = require('../MoveVector')
 const {chessPieces} = require('../utils')
 
 
@@ -12,23 +13,32 @@ class King extends ChessPiece {
         const symbol = (colour == "white") ? chessPieces.white.King : chessPieces.black.King 
 
         // Define the movement mechanics as a vector (magnitude & direction)
-        // Kings move horizonatlly or vertically along ranks and files as well as along diagonals
-        const movement = [  
-                            [1, 0],         // Vector for moving King North
-                            [-1, 0],        // Vector for moving King South
-                            [0, 1],         // Vector for moving King East 
-                            [0, -1],        // Vector for moving King West 
-                            [1, 1],         // Vector for moving King North East
-                            [1, -1],        // Vector for moving King North West
-                            [-1, 1],        // Vector for moving King South East
-                            [-1, -1]        // Vector for moving King South West
-                        ]
-
-        // Kings can move one square at a time along a rank, file or diagonal
+        
+        // Kings can move one square
         const movementRestricted = true
 
+        // Kings move horizonatlly, vertically and along diagonals
+        const movement = [  
+                            // Vector for moving King North
+                            new MoveVector(1, 0, movementRestricted),
+                            // Vector for moving King South
+                            new MoveVector(-1, 0, movementRestricted),
+                            // Vector for moving King East
+                            new MoveVector(0, 1, movementRestricted),
+                            // Vector for moving King West 
+                            new MoveVector(0, -1, movementRestricted),
+                            // Vector for moving King North East
+                            new MoveVector(1, 1, movementRestricted),
+                            // Vector for moving King North West
+                            new MoveVector(1, -1, movementRestricted),
+                            // Vector for moving King South East
+                            new MoveVector(-1, 1, movementRestricted),
+                            // Vector for moving King South West
+                            new MoveVector(-1, -1, movementRestricted)
+                        ]
+
         // Set the Bishop properties in the superclass
-        super('King', colour, symbol, position, movement, movementRestricted)
+        super('King', colour, symbol, position, movement)
 
         
         /* SET PROPERTIES FOR CURRENT King CLASS */

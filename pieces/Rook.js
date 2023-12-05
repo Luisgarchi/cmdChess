@@ -1,4 +1,5 @@
 const ChessPiece = require('./ChessPiece')
+const MoveVector = require('../MoveVector')
 const {chessPieces} = require('../utils')
 
 
@@ -12,19 +13,25 @@ class Rook extends ChessPiece {
         const symbol = (colour == "white") ? chessPieces.white.Rook : chessPieces.black.Rook 
 
         // Define the movement mechanics as a vector (magnitude & direction)
-        // Rooks move horizonatlly or vertically along ranks and files
-        const movement = [  
-                            [1, 0],         // Vector for moving Rook North 
-                            [-1, 0],        // Vector for moving Rook South 
-                            [0, 1],         // Vector for moving Rook East 
-                            [0, -1]         // Vector for moving Rook West 
-                        ]
 
-        // Rooks can move any amount along rank or file
+        // Rooks can move any amount of squares
         const movementRestricted = false
 
+        // Rooks move horizonatlly or vertically along ranks and files
+        const movement = [  
+                            // Vector for moving Rook North
+                            new MoveVector(1, 0, movementRestricted),
+                            // Vector for moving Rook South
+                            new MoveVector(-1, 0, movementRestricted),
+                            // Vector for moving Rook East
+                            new MoveVector(0, 1, movementRestricted),
+                            // Vector for moving Rook West 
+                            new MoveVector(0, -1, movementRestricted),        
+                        ]
+        
+
         // Set the Bishop properties in the superclass
-        super('Rook', colour, symbol, position, movement, movementRestricted)
+        super('Rook', colour, symbol, position, movement)
         
 
         /* SET PROPERTIES FOR CURRENT Rook CLASS */

@@ -1,4 +1,5 @@
 const ChessPiece = require('./ChessPiece')
+const MoveVector = require('../MoveVector')
 const {chessPieces} = require('../utils')
 
 
@@ -18,23 +19,27 @@ class Pawn extends ChessPiece {
         /* The direction is included since pawn movement vectors are not symetric.
         By adding this variable, it establishes the directions black and white pawns move in*/
         const direction = (colour == "white") ? 1 : -1
+                
+        // Pawns can *GENERALLY* only move along a movement vector once
+        const movementRestricted = true 
 
         const movement = [
-                            [(direction * 1),  0],         // Vector for moving Pawn along file one square 
-                            [(direction * 2),  0],         // Vector for moving Pawn along file two square *
-                            [(direction * 1),  1],         // Vector for moving Pawn diagonally capture right **
-                            [(direction * 1), -1],         // Vector for moving Pawn diagonally capture left  ** 
+                            // Vector for moving Pawn along file one square 
+                            new MoveVector((direction * 1),  0, movementRestricted),         
+                            // Vector for moving Pawn along file two square *
+                            new MoveVector((direction * 2),  0, movementRestricted),
+                            // Vector for moving Pawn diagonally capture right **
+                            new MoveVector((direction * 1),  1, movementRestricted),
+                            // Vector for moving Pawn diagonally capture left  ** 
+                            new MoveVector((direction * 1),  -1, movementRestricted),
         ]     
 
         // * Movement is only possible if the pawn has not moved (i.e. it is in its initial rank)
         // ** these apply to generic pawn captures as well as en passant.
         // Both of the above scenarios must be handled during a chess game (in the ChessBoard class)
 
-        // Pawns can *GENERALLY* only move along a movement vector once
-        const movementRestricted = true     
-
         // Set the Pawn properties in the superclass
-        super('Pawn', colour, symbol, position, movement, movementRestricted)
+        super('Pawn', colour, symbol, position, movement)
 
     
         /* SET PROPERTIES FOR CURRENT Rook CLASS */
@@ -49,6 +54,8 @@ class Pawn extends ChessPiece {
 
     reachableSquares(){
 
+        // vector must be of type MoveVector
+
         // Method overwrites chessPiece method to include pawn movement 
         // of 2 squares from starting rank
         
@@ -59,8 +66,8 @@ class Pawn extends ChessPiece {
         for (let i = 0; i < this._movement.length; i++){
 
             const vector     = this._movement[i]
-            const vectorFile = vector[1]
-            const vectorRank = vector[0]
+            const vectorRank = vector.rankComponent
+            const vectorFile = vector.fileComponent
             
             // Check that the pawn is still on the starting rank
             if ((Math.abs(vectorRank) == 2) && (vectorFile == 0)){
@@ -73,7 +80,7 @@ class Pawn extends ChessPiece {
                 }
             }
             
-            const positionsAlongVector = this.findPositionsAlongVector(this._movement[i])
+            const positionsAlongVector = this.findPositionsAlongVector(vector)
             allReachablePositions.push(...positionsAlongVector)
         }
         

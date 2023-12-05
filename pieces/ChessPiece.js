@@ -3,14 +3,13 @@ const {fileToNum, numToFile, rankToNum, numToRank} = require('../utils')
 
 class ChessPiece {
 
-    constructor(type, colour, symbol, position, movement, movementRestricted) {
+    constructor(type, colour, symbol, position, movement) {
 
         this._type     = type                           // the type of the chess piece
         this._colour   = colour                         // throw error if position does not match colour
         this._symbol   = symbol                         // utf-8 encoding of chess piece
         this._position = position                       // Position of piece on chess board
         this._movement = movement                       // Movement vectors of the piece
-        this._movementRestricted = movementRestricted   // If piece can nove more than one vector 
     }
 
     // Getters 
@@ -28,10 +27,6 @@ class ChessPiece {
 
     get colour(){
         return this._colour
-    }
-
-    get movementRestricted(){
-        return this._movementRestricted
     }
     
 
@@ -59,6 +54,10 @@ class ChessPiece {
 
     findPositionsAlongVector(vector) {
 
+
+        // vector must be of type MoveVector
+
+
         // This method finds all the sqaures that can be reached along a given vector for the piece
 
         const vectorReachablePositions = []
@@ -69,9 +68,9 @@ class ChessPiece {
         let rank = rankToNum(currentPosition[1])
 
         // Get the file and rank components of the vector
-        const vectorFile = vector[1]
-        const vectorRank = vector[0]
- 
+        const vectorRank = vector.rankComponent
+        const vectorFile = vector.fileComponent
+
         // Add the vector to the file and rank
         do {
             file += vectorFile
@@ -88,7 +87,7 @@ class ChessPiece {
             }
             // Stop if the piece's movement is restricted. Otherwise keep looping until...
             // the new position of the piece is off the board.
-        } while ((!this._movementRestricted) && (((rank <= 8) && (rank >= 1)) && ((file <= 8) && (file >= 1)))) 
+        } while ((!vector.restricted) && (((rank <= 8) && (rank >= 1)) && ((file <= 8) && (file >= 1)))) 
 
         return vectorReachablePositions
     }
