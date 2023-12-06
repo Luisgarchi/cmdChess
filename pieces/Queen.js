@@ -42,7 +42,7 @@ class Queen extends ChessPiece {
         super('Queen', colour, symbol, position, movement)
 
         
-        /* SET PROPERTIES FOR CURRENT Rook CLASS */
+        /* SET PROPERTIES FOR CURRENT Queen CLASS */
 
         // Points of materials the piece is worth
         this.points = 9

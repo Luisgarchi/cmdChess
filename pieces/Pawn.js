@@ -42,7 +42,7 @@ class Pawn extends ChessPiece {
         super('Pawn', colour, symbol, position, movement)
 
     
-        /* SET PROPERTIES FOR CURRENT Rook CLASS */
+        /* SET PROPERTIES FOR CURRENT Pawn CLASS */
 
         // Points of materials the piece is worth
         this.points = 1
@@ -53,8 +53,6 @@ class Pawn extends ChessPiece {
 
 
     reachableSquares(){
-
-        // vector must be of type MoveVector
 
         // Method overwrites chessPiece method to include pawn movement 
         // of 2 squares from starting rank
@@ -84,9 +82,10 @@ class Pawn extends ChessPiece {
             allReachablePositions.push(...positionsAlongVector)
         }
         
-        return allReachablePositions
+        return [... new Set(allReachablePositions)]
     }
 
 }
+
 
 module.exports = Pawn

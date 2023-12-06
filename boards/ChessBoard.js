@@ -31,7 +31,7 @@ class ChessBoard extends Board {
         // Initialize the board starting position
         this.#initializeBoard()
 
-        // Conigure chess notation setup - (Standard) Algebraic Notion
+        // Conigure chess notation setup - (Standard) Avectorlgebraic Notion
         this._notationMoves = notationMoves
         this._boardLabels = createBoardDimensionObject('a', 'h', '1', '8')
     }
@@ -178,18 +178,15 @@ class ChessBoard extends Board {
         /* Find and return the piece located at provided position
         If there is no piece present return null */
 
-        let piece = null
-
         // Iterate over all the piece on the board
         for (let i = 0; i < this._pieces.length; i++) {
 
             // Check if a piece matches is on the required position
             if (this._pieces[i].position == position) {
-                piece = this._pieces[i]
-                break
+                return this._pieces[i]
             }
         }
-        return piece
+        return null
     }
 
 
@@ -207,7 +204,7 @@ class ChessBoard extends Board {
         const matchingPieceVector = piece.findMatchingVector(vector)
 
         // Find all other square that lie on this vector not including piece.position.
-        const squaresAlongVector = piece.findPositionsAlongVector(vector)
+        const squaresAlongVector = piece.findPositionsAlongVector(matchingPieceVector)
 
         // Check if any of the pieces on the board block the piece from moving to targetPosition
         for (let i = 0; i < this._pieces.length; i++){
@@ -219,11 +216,11 @@ class ChessBoard extends Board {
             - If the blocking piece is an opposing coloured piece ON THE TARGET POSITION,
               the move is not considered invalid because said piece may be captured.
             - Pawns are not able to capture an opposing coloured piece on the targetPosition 
-              if the intended move is along a file. 
+              if the intended move is along the same file. 
 
             Variable "includeLastSquare" and boolean "exceptions" implement the above logic */
 
-            const movementAlongFile = (vector[1] == 0)
+            const movementAlongFile = (vector.fileComponent == 0)
             const exceptions = (
                 (this._pieces[i].colour == piece.colour) ||          
                 ((piece.type == 'Pawn') && (movementAlongFile))
@@ -255,7 +252,7 @@ class ChessBoard extends Board {
         const rankVector = intPositionB.rank - intPositionA.rank 
 
         // Compose vector
-        return MoveVector(rankVector, fileVector)
+        return new MoveVector(rankVector, fileVector)
 
     }
 
@@ -271,7 +268,7 @@ class ChessBoard extends Board {
         // Check the board for enemy piece at the required location 
         for(let i = 0; i < this._pieces.length; i++){
 
-            // In der for a piece to be captured it must be of a different colour
+            // In order for a piece to be captured it must be of a different colour
             // as well as being in the diagonal vector position
             if ((this._pieces[i].colour != pawn.colour) &&
                 (this._pieces[i].position == positionEnemyPiece)){  
@@ -349,11 +346,16 @@ class ChessBoard extends Board {
         }
 
         // 6.5) Extra logic for Pawn capture movement
-        const vector = this._getVector(piece, endPosition)
-        const isDiagonalVector = ((Math.abs(vector[0]) == 1) && (Math.abs(vector[1]) == 1))
+
+        const unitVector = this._calculateVector(startPosition, endPosition).findUnitVector()
+
+        const isDiagonalVector = (
+            (Math.abs(unitVector.rankComponent) == 1) && 
+            (Math.abs(unitVector.fileComponent) == 1))
+
         if ((piece.type == 'Pawn')      &&                       // Only Pawns
             (isDiagonalVector)          &&                       // Diagonal moves 
-            (!this.canPawnCapture(piece, vector))){              // Check capture 
+            (!this.canPawnCapture(piece, unitVector))){          // Check capture 
                 throw new PieceMovementError(piece)
         }
 
@@ -394,18 +396,20 @@ class ChessBoard extends Board {
         - movement is valid and thus there is no need to check that another piece 
         is blocking...
         - And therefore any piece located at endPosition will be a different colour. */
-        
+
+        let isCaptured = false
         let capturedIndex
         for (let i = 0; i < this._pieces.length; i++){
             if ((this._pieces[i].position == endPosition)){
                 // When we find a piece stop and save the index of the piece
                 this._capturedPieces.push(this.this._pieces[i])
                 capturedIndex = i
+                isCaptured = true
                 break
             }
         }
 
-        if(capturedIndex){
+        if(isCaptured){
 
             // If a piece is captured add it to the "captured" array 
             this._capturedPieces.push(this._pieces[capturedIndex])
@@ -419,12 +423,14 @@ class ChessBoard extends Board {
 }
 
 
+
 module.exports = ChessBoard
 
-const move = 'd7d5'
+
+const move = 'f2f4'
 const startPieces = [
-    new Bishop("black", "d5"),
-    new Pawn("black", "d7"),        // Piece being moved
+    new Knight("white", "f3"),
+    new Pawn("white", "f2"),        // Piece being moved
 ]
 testBoard = new ChessBoard(1,5, 'UCI', startPieces)
 
