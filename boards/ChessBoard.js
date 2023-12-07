@@ -203,8 +203,8 @@ class ChessBoard extends Board {
         // Use this vector to find the matching piece vector
         const matchingPieceVector = piece.findMatchingVector(vector)
 
-        // Find all other square that lie on this vector not including piece.position.
-        const squaresAlongVector = piece.findPositionsAlongVector(matchingPieceVector)
+        // Find all other squares that lie on this vector not including piece.position.
+        const squaresAlongVector = matchingPieceVector.findPositionsAlongVector(initialPosition, targetPosition)
 
         // Check if any of the pieces on the board block the piece from moving to targetPosition
         for (let i = 0; i < this._pieces.length; i++){
@@ -384,7 +384,7 @@ class ChessBoard extends Board {
         this._moveCharacter(intStartPosition.rank, intStartPosition.file, intEndPosition.rank, intEndPosition.file)
 
         // Update the piece object position
-        piece.updatedPosition = endPosition
+        piece.updatedPosition(endPosition)
     }
 
     #handleCapture(endPosition){
@@ -427,10 +427,10 @@ class ChessBoard extends Board {
 module.exports = ChessBoard
 
 
-const move = 'f2f4'
+
+const move = 'e3e5'
 const startPieces = [
-    new Knight("white", "f3"),
-    new Pawn("white", "f2"),        // Piece being moved
+    new Pawn("white", "e3"),        // Piece being moved
 ]
 testBoard = new ChessBoard(1,5, 'UCI', startPieces)
 
@@ -439,3 +439,5 @@ testBoard.display()
 testBoard.makeMove(move)
 testBoard.buildBoard()
 testBoard.display()
+
+

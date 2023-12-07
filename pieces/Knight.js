@@ -17,24 +17,32 @@ class Knight extends ChessPiece {
         // Knights can only "hop" one vector at a time
         const movementRestricted = true         
 
+        /* Knights are "said" to be able to jump over pieces. 
+
+        While there are no "discrete" (the centre of a square) squares on a chess board 
+        directly along the vector a knight moves in, a knight is still able to move even 
+        if boxed in by by other pieces (such as the case when a Knight is the first piece 
+        to move in a chess match), therefore technically we say a Knigth can jump */
+        const jump = true 
+
         // Knights move along 2 squares and then 1 square perpendicular to it
         const movement = [  
                             // Vectors for moving Knight North North East 
-                            new MoveVector(2, 1, movementRestricted), 
+                            new MoveVector(2, 1, jump, movementRestricted), 
                             // Vectors for moving Knight North East East 
-                            new MoveVector(1, 2, movementRestricted), 
+                            new MoveVector(1, 2, jump, movementRestricted), 
                             // Vectors for moving Knight North North West
-                            new MoveVector(2, -1, movementRestricted), 
+                            new MoveVector(2, -1, jump, movementRestricted), 
                             // Vectors for moving Knight North West West
-                            new MoveVector(1, -2, movementRestricted),
+                            new MoveVector(1, -2, jump, movementRestricted),
                             // Vectors for moving Knight South South East
-                            new MoveVector(-2, 1, movementRestricted), 
+                            new MoveVector(-2, 1, jump, movementRestricted), 
                             // Vectors for moving Knight South East East
-                            new MoveVector(-1, 2, movementRestricted),
+                            new MoveVector(-1, 2, jump, movementRestricted),
                             // Vectors for moving Knight South South West
-                            new MoveVector(-2, -1, movementRestricted),
+                            new MoveVector(-2, -1, jump, movementRestricted),
                             // Vector for moving Knight South West West
-                            new MoveVector(-1, -2, movementRestricted)
+                            new MoveVector(-1, -2, jump, movementRestricted)
                         ]
     
 

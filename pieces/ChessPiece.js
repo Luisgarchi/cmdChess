@@ -18,7 +18,7 @@ class ChessPiece {
     }
     
     get position() {
-        return this._position
+        return this._position 
     }
     
     get symbol() {
@@ -28,10 +28,12 @@ class ChessPiece {
     get colour(){
         return this._colour
     }
+
+
     
 
-    // Setters
-    set updatedPosition(newPosition) {
+    // Custom Setters
+    updatePosition(newPosition) {
         this._position = newPosition
     }
     
@@ -60,9 +62,9 @@ class ChessPiece {
 
         // vector must be of type MoveVector
 
-        /* method finds and returns the matching piece vector. Note this method is required because 
-        a movement vector calculated from the start and end positions does not include information 
-        on whether the movement is restricted or not. */
+        /* method finds and returns the matching piece vector. Note this method is 
+        required because a movement vector calculated from the start and end positions 
+        does not include information on whether the movement is restricted or not. */
 
         // Step 1) check if the vector matches
 
@@ -74,6 +76,7 @@ class ChessPiece {
 
         // Step 2) check if the unit vector matches
         const unitVector = vector.findUnitVector()
+        
         return this.#findVector(unitVector)
 
     }

@@ -15,18 +15,21 @@ class Bishop extends ChessPiece {
         // Define the movement mechanics as a vector (magnitude & direction)
 
         // Bishops can move any amount of squares
-        const movementRestricted = false       
+        const movementRestricted = false
+
+        // Bishops can not jump over pieces
+        const jump = false
 
         // Bishops only move along diagonals
         const movement = [  
                             // Vector for moving Bishop North East
-                            new MoveVector(1, 1, movementRestricted),
+                            new MoveVector(1, 1, jump, movementRestricted),
                             // Vector for moving Bishop North West
-                            new MoveVector(1, -1, movementRestricted),
+                            new MoveVector(1, -1, jump, movementRestricted),
                             // Vector for moving Bishop South East
-                            new MoveVector(-1, 1, movementRestricted),
+                            new MoveVector(-1, 1, jump, movementRestricted),
                             // Vector for moving Bishop South West
-                            new MoveVector(-1, -1, movementRestricted)
+                            new MoveVector(-1, -1, jump, movementRestricted)
                         ]
 
         // Set the Bishop properties in the superclass

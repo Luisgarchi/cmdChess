@@ -17,24 +17,27 @@ class Queen extends ChessPiece {
         // Queens can move any amount of squares
         const movementRestricted = false
 
+        // Queens can not jump over any pieces
+        const jump = false
+
         // Queens move horizonatlly or vertically along ranks and files as well as along diagonals
         const movement = [
                             // Vector for moving Queen North
-                            new MoveVector(1, 0, movementRestricted),
+                            new MoveVector(1, 0, jump, movementRestricted),
                             // Vector for moving Queen South
-                            new MoveVector(-1, 0, movementRestricted),
+                            new MoveVector(-1, 0, jump, movementRestricted),
                             // Vector for moving Queen East
-                            new MoveVector(0, 1, movementRestricted),
+                            new MoveVector(0, 1, jump, movementRestricted),
                             // Vector for moving Queen West 
-                            new MoveVector(0, -1, movementRestricted),        
+                            new MoveVector(0, -1, jump, movementRestricted),        
                             // Vector for moving Queen North East
-                            new MoveVector(1, 1, movementRestricted),
+                            new MoveVector(1, 1, jump, movementRestricted),
                             // Vector for moving Queen North West
-                            new MoveVector(1, -1, movementRestricted),
+                            new MoveVector(1, -1, jump, movementRestricted),
                             // Vector for moving Queen South East
-                            new MoveVector(-1, 1, movementRestricted),
+                            new MoveVector(-1, 1, jump, movementRestricted),
                             // Vector for moving Queen South West
-                            new MoveVector(-1, -1, movementRestricted)
+                            new MoveVector(-1, -1, jump, movementRestricted)
                         ]
 
 

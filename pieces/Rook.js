@@ -17,16 +17,19 @@ class Rook extends ChessPiece {
         // Rooks can move any amount of squares
         const movementRestricted = false
 
+        // Rooks can not jump over pieces
+        const jump = false
+
         // Rooks move horizonatlly or vertically along ranks and files
         const movement = [  
                             // Vector for moving Rook North
-                            new MoveVector(1, 0, movementRestricted),
+                            new MoveVector(1, 0, jump, movementRestricted),
                             // Vector for moving Rook South
-                            new MoveVector(-1, 0, movementRestricted),
+                            new MoveVector(-1, 0, jump, movementRestricted),
                             // Vector for moving Rook East
-                            new MoveVector(0, 1, movementRestricted),
+                            new MoveVector(0, 1, jump, movementRestricted),
                             // Vector for moving Rook West 
-                            new MoveVector(0, -1, movementRestricted),        
+                            new MoveVector(0, -1, jump, movementRestricted),        
                         ]
         
 

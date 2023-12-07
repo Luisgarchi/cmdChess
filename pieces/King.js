@@ -17,24 +17,28 @@ class King extends ChessPiece {
         // Kings can move one square
         const movementRestricted = true
 
+        /* Kings can not jump over pieces. This is implict since Kings can only move 
+        one square at a time, but is specified for completeness*/
+        const jump = false
+
         // Kings move horizonatlly, vertically and along diagonals
         const movement = [  
                             // Vector for moving King North
-                            new MoveVector(1, 0, movementRestricted),
+                            new MoveVector(1, 0, jump, movementRestricted),
                             // Vector for moving King South
-                            new MoveVector(-1, 0, movementRestricted),
+                            new MoveVector(-1, 0, jump, movementRestricted),
                             // Vector for moving King East
-                            new MoveVector(0, 1, movementRestricted),
+                            new MoveVector(0, 1, jump, movementRestricted),
                             // Vector for moving King West 
-                            new MoveVector(0, -1, movementRestricted),
+                            new MoveVector(0, -1, jump, movementRestricted),
                             // Vector for moving King North East
-                            new MoveVector(1, 1, movementRestricted),
+                            new MoveVector(1, 1, jump, movementRestricted),
                             // Vector for moving King North West
-                            new MoveVector(1, -1, movementRestricted),
+                            new MoveVector(1, -1, jump, movementRestricted),
                             // Vector for moving King South East
-                            new MoveVector(-1, 1, movementRestricted),
+                            new MoveVector(-1, 1, jump, movementRestricted),
                             // Vector for moving King South West
-                            new MoveVector(-1, -1, movementRestricted)
+                            new MoveVector(-1, -1, jump, movementRestricted)
                         ]
 
         // Set the Bishop properties in the superclass
